@@ -29,15 +29,60 @@ Requires `drop_params: true` in your LiteLLM `litellm_settings` config.
 ## Installation
 
 ```bash
-pi install npm:pi-litellm
+pi install git:github.com/xec-abailey/pi-litellm
 ```
 
 Or in `.pi/settings.json`:
 
 ```json
 {
-  "packages": ["npm:pi-litellm"]
+  "packages": ["git:github.com/xec-abailey/pi-litellm"]
 }
+```
+
+To update after pushing changes:
+
+```bash
+pi update git:github.com/xec-abailey/pi-litellm
+```
+
+## Local Extension Development
+
+For active development, switch from the git source to a local path so edits are picked up immediately on `/reload` without needing to commit and push.
+
+### Setup
+
+```bash
+# Clone to ~/projects (skip if already exists)
+[ -d ~/projects/pi-litellm ] || git clone https://github.com/xec-abailey/pi-litellm.git ~/projects/pi-litellm
+
+# Switch the project settings to use the local path
+cd <your-project>
+sed -i 's|"git:github.com/xec-abailey/pi-litellm"|"../../projects/pi-litellm"|' .pi/settings.json
+```
+
+Then `/reload` in Pi. Edits to `~/projects/pi-litellm/extensions/` are live immediately.
+
+### Switch back to git source
+
+```bash
+cd <your-project>
+sed -i 's|"../../projects/pi-litellm"|"git:github.com/xec-abailey/pi-litellm"|' .pi/settings.json
+```
+
+### Helper script
+
+A convenience script is provided at `scripts/dev.sh`:
+
+```bash
+# Enter local dev mode
+./scripts/dev.sh local
+
+# Switch back to git source
+./scripts/dev.sh git
+
+# Check current mode
+./scripts/dev.sh status
 ```
 
 ## Configuration
