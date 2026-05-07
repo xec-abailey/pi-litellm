@@ -1,18 +1,19 @@
 {
   "name": "pi-litellm",
-  "version": "1.1.0",
-  "description": "LiteLLM integration for Pi — accurate cost tracking via proxy headers and session grouping",
+  "version": "1.1.1",
+  "description": "LiteLLM integration for Pi — dynamic model sync, accurate cost tracking, and session grouping",
   "keywords": [
     "pi-package",
     "litellm",
     "cost-tracking",
-    "session-grouping"
+    "session-grouping",
+    "model-sync"
   ],
   "license": "MIT",
   "author": "abailey",
   "repository": {
     "type": "git",
-    "url": "https://github.com/abailey/pi-litellm"
+    "url": "git+https://github.com/xec-abailey/pi-litellm.git"
   },
   "pi": {
     "extensions": [
