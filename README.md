@@ -6,12 +6,12 @@ LiteLLM integration extensions for [Pi](https://github.com/earendil-works/pi-cod
 
 ### Model Sync (`litellm-sync.ts`)
 
-Keeps the Pi model selector in sync with LiteLLM's live model list. On startup (and on `/reload`), fetches `GET /v1/models` from LiteLLM and registers the provider with the exact model IDs that LiteLLM exposes.
+Keeps the Pi model selector in sync with LiteLLM's live model list. On startup (and on `/reload`), it tries `GET /model/info` first for rich metadata and falls back to `GET /v1/models` when LiteLLM virtual keys cannot access the admin endpoint.
 
 **Before:** `claude-opus-4.6 [litellm]` (stale, doesn't match LiteLLM routing names)
 **After:** `bedrock/claude-opus-4.6 [litellm]`, `openrouter/claude-sonnet-4.6 [litellm]`
 
-Model capabilities (reasoning, context window, max tokens, thinking levels) are auto-detected from the model ID.
+Model costs, context windows, max output tokens, reasoning support, and vision support come from `/model/info` when available. Fallback models keep the exact LiteLLM IDs and use conservative defaults. Anthropic and Claude aliases are registered with Anthropic cache-control compatibility so Pi can pass prompt cache markers through LiteLLM.
 
 ### Cost Tracking (`litellm-cost.ts`)
 
@@ -91,8 +91,14 @@ Set environment variables (or configure in `~/.pi/agent/models.json`):
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LITELLM_BASE_URL` | `http://localhost:4000` | LiteLLM proxy URL |
+| `LITELLM_BASE_URL` | `http://localhost:4000` | LiteLLM proxy URL, with or without a trailing `/v1` |
 | `LITELLM_API_KEY` | `sk-cedar-local` | LiteLLM API key |
+| `LITELLM_DISCOVERY_TIMEOUT_MS` | `5000` | Model discovery timeout in milliseconds; `0` skips startup discovery |
+| `LITELLM_OFFLINE` | unset | If `1`, skips network discovery and uses the model cache |
+
+You can also run `/login litellm` inside Pi. Stored Pi credentials take precedence over environment variables. Environment variables take precedence over `models.json`, which takes precedence over the local defaults above.
+
+Use `/litellm-refresh` inside Pi to force a fresh model discovery without restarting.
 
 ### models.json (optional)
 
@@ -103,16 +109,16 @@ If you prefer file-based config over env vars, add a `litellm` provider entry to
   "providers": {
     "litellm": {
       "baseUrl": "http://localhost:4000",
-      "api": "anthropic-messages",
+      "api": "openai-completions",
       "apiKey": "sk-cedar-local"
     }
   }
 }
 ```
 
-The sync extension reads `baseUrl`, `apiKey`, and `api` from this config. You do **not** need to define models here — they're populated dynamically from LiteLLM.
+The sync extension reads `baseUrl`, `apiKey`, and `api` from this config. You do **not** need to define models here — they're populated dynamically from LiteLLM and cached at `~/.pi/agent/litellm-models.json`.
 
-Priority: environment variables > models.json > defaults.
+Priority: stored `/login litellm` credentials > environment variables > models.json > defaults.
 
 ## LiteLLM Setup
 
@@ -130,11 +136,12 @@ This ensures:
 ## How Model Sync Works
 
 1. Extension loads as an async factory (runs before `session_start`)
-2. Fetches `GET /v1/models` from LiteLLM → returns `model_name` values from config.yaml
+2. Fetches `GET /model/info` from LiteLLM when available, otherwise falls back to `GET /v1/models`
 3. Calls `pi.registerProvider("litellm", { models: [...] })` with those exact IDs
-4. On `/reload`, re-fetches and re-registers to pick up config changes
+4. Writes the discovered list to `~/.pi/agent/litellm-models.json`
+5. On `/reload` or `/litellm-refresh`, re-fetches and re-registers to pick up config changes
 
-If LiteLLM is unreachable at startup, the extension logs a warning and skips registration — Pi continues with whatever models are already configured.
+If LiteLLM is unreachable at startup, the extension logs a warning and uses the cached model list when the configured base URL and API key fingerprint still match.
 
 ## License
 

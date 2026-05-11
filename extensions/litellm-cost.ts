@@ -13,6 +13,8 @@
  *   Set LITELLM_API_KEY env var if your proxy requires auth (default: sk-cedar-local)
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { getAgentDir } from "@earendil-works/pi-coding-agent";
+import { resolveLiteLLMConfig } from "../lib/litellm.ts";
 
 interface ModelCostInfo {
   inputCostPerToken: number;
@@ -22,8 +24,7 @@ interface ModelCostInfo {
 }
 
 export default function (pi: ExtensionAPI) {
-  const LITELLM_BASE_URL = process.env.LITELLM_BASE_URL || "http://localhost:4000";
-  const LITELLM_API_KEY = process.env.LITELLM_API_KEY || "sk-cedar-local";
+  const agentDir = getAgentDir();
 
   // Store per-model cost info from /model/info
   const modelCosts = new Map<string, ModelCostInfo>();
@@ -34,9 +35,10 @@ export default function (pi: ExtensionAPI) {
   // Fetch model pricing from LiteLLM at startup
   pi.on("session_start", async (_event, ctx) => {
     try {
-      const response = await fetch(`${LITELLM_BASE_URL}/model/info`, {
+      const config = await resolveLiteLLMConfig({ agentDir });
+      const response = await fetch(`${config.baseUrl}/model/info`, {
         headers: {
-          Authorization: `Bearer ${LITELLM_API_KEY}`,
+          Authorization: `Bearer ${config.apiKey}`,
           Accept: "application/json",
         },
       });

@@ -2,6 +2,7 @@
   "name": "pi-litellm",
   "version": "1.1.1",
   "description": "LiteLLM integration for Pi — dynamic model sync, accurate cost tracking, and session grouping",
+  "type": "module",
   "keywords": [
     "pi-package",
     "litellm",
@@ -20,7 +21,18 @@
       "./extensions"
     ]
   },
+  "scripts": {
+    "test": "vitest --run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm test"
+  },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^0.74.0",
+    "@types/node": "^24.12.3",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   }
 }
