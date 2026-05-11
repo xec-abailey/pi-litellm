@@ -31,8 +31,8 @@
   },
   "devDependencies": {
     "@earendil-works/pi-coding-agent": "^0.74.0",
-    "@types/node": "^24.12.3",
-    "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "@types/node": "^25.6.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.6"
   }
 }

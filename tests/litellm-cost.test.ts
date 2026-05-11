@@ -32,7 +32,7 @@ async function loadExtension(agentDir: string): Promise<(pi: TestPi) => void> {
 afterEach(() => {
   vi.restoreAllMocks();
   vi.resetModules();
-  vi.unmock("@earendil-works/pi-coding-agent");
+  vi.doUnmock("@earendil-works/pi-coding-agent");
   delete process.env.LITELLM_BASE_URL;
   delete process.env.LITELLM_API_KEY;
 });
