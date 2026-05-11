@@ -21,6 +21,11 @@
       "./extensions"
     ]
   },
+  "files": [
+    "README.md",
+    "extensions",
+    "lib"
+  ],
   "scripts": {
     "test": "vitest --run",
     "typecheck": "tsc --noEmit",
