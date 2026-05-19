@@ -1,0 +1,10 @@
+node_modules/
+.git/
+.github/
+tests/
+scripts/supply-chain-guard.mjs
+.env
+.npmrc
+*.tgz
+*.log
+.DS_Store

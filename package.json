@@ -15,6 +15,15 @@
     "type": "git",
     "url": "git+https://github.com/xec-abailey/pi-litellm.git"
   },
+  "files": [
+    "extensions/",
+    "scripts/dev.sh",
+    "README.md"
+  ],
+  "scripts": {
+    "security:check": "node scripts/supply-chain-guard.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
   "pi": {
     "extensions": [
       "./extensions"

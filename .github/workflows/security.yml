@@ -1,0 +1,42 @@
+name: Supply Chain
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  npm-security:
+    name: npm security checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install without lifecycle scripts
+        run: npm ci --ignore-scripts --legacy-peer-deps
+
+      - name: Test
+        run: npm test
+
+      - name: Supply-chain guard
+        run: npm run security:check
+
+      - name: Audit
+        run: npm audit --omit=dev --legacy-peer-deps
+
+      - name: Package dry run
+        run: npm pack --dry-run --ignore-scripts

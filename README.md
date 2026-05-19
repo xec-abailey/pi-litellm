@@ -85,6 +85,18 @@ A convenience script is provided at `scripts/dev.sh`:
 ./scripts/dev.sh status
 ```
 
+## Security Checks
+
+Run the local security checks before publishing or changing package metadata:
+
+```bash
+npm test
+npm run security:check
+npm pack --dry-run --ignore-scripts
+```
+
+The supply-chain guard blocks npm lifecycle hooks, direct runtime/dev/optional/bundled dependencies, Git or URL dependency specs, known Mini Shai-Hulud payload markers, and unexpected files in the npm package. CI installs with `npm ci --ignore-scripts --legacy-peer-deps` so dependency lifecycle scripts cannot run during verification.
+
 ## Configuration
 
 Set environment variables (or configure in `~/.pi/agent/models.json`):
